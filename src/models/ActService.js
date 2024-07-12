@@ -9,15 +9,15 @@ db.prepare(`CREATE TABLE IF NOT EXISTS ActualizacionServicio
     FOREIGN KEY (idServicio) REFERENCES Servicio(id)
     )`).run();
 
-export default class $$ActualizacionServicio {
+export default class $$ActService {
 
     static create(idServicio, mensaje) {
         db.prepare(`INSERT INTO ActualizacionServicio (idServicio, mensaje) VALUES(?, ?)`).run(idServicio, mensaje);
         return { 'message': 'OK' };
     }
 
-    static read(idUsuario) {
-        let res = db.prepare(`SELECT * FROM ActualizacionServicio WHERE idServicio = ?`).all(idUsuario);
+    static read(idServicio) {
+        let res = db.prepare(`SELECT * FROM ActualizacionServicio WHERE idServicio = ?`).all(idServicio);
         return res;
     }
 
