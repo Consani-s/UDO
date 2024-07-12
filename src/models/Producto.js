@@ -7,9 +7,7 @@ db.prepare(`CREATE TABLE IF NOT EXISTS Producto
     nombre TEXT, 
     descrip TEXT, 
     stock INTEGER, 
-    priceU INTEGER, 
-    idImage INTEGER, 
-    FOREIGN KEY (idImage) REFERENCES Imagen(id))`).run();
+    priceU INTEGER)`).run();
 
 function comprobarAdmin(adminID) {
     let json = db.prepare(`SELECT * FROM Usuario WHERE id = ? AND type = 1`).get(adminID);
@@ -18,9 +16,9 @@ function comprobarAdmin(adminID) {
 
 export default class $$Producto {
 
-    static create(adminID, nombre, descrip, stock, priceU, idImage) {
+    static create(adminID, nombre, descrip, stock, priceU) {
         if (!comprobarAdmin(adminID)) throw new Error('No tienes permisos.');
-        let id = db.prepare(`INSERT INTO Producto (nombre, descrip, stock, priceU, idImage) VALUES(?, ?, ?, ?, ?)`).run(nombre, descrip, stock, priceU, idImage);
+        let id = db.prepare(`INSERT INTO Producto (nombre, descrip, stock, priceU) VALUES(?, ?, ?, ?)`).run(nombre, descrip, stock, priceU);
         return { 'id': id.lastInsertRowid };
     }
 

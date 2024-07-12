@@ -32,4 +32,9 @@ export default class $$Categoria {
         return { 'message': 'OK' };
     }
 
+    static deleteAll(idProducto) {
+        db.prepare(`DELETE FROM Categoria WHERE idProducto = ?`).run(id);
+        return { 'message': 'OK' };
+    }
+
 }

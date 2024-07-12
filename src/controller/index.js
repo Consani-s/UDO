@@ -7,6 +7,9 @@ import $$Usuario from '../models/Usuario.js';
 import $$Producto from '../models/Producto.js';
 import $$Imagen from '../models/Imagen.js';
 import $$Servicio from '../models/Servicio.js';
+import $$Dialogo from '../models/Dialogo.js';
+import $$ActService from '../models/ActService.js';
+import $$Categoria from '../models/Categoria.js';
 
 server.use(bodyParser.raw({ type: 'application/octet-stream', limit: '500mb' }));
 server.use(express.json({ limit: '500mb' }));
@@ -58,9 +61,9 @@ server.get('/deleteUsuario/:adminID/:userID', function (req, res) {
 // FIN - USUARIO
 
 // PRODUCTO
-server.get('/createProducto/:adminID/:nombre/:descrip/:stock/:priceU/:idImage', function (req, res) {
+server.get('/createProducto/:adminID/:nombre/:descrip/:stock/:priceU', function (req, res) {
     try {
-        res.status(200).send($$Producto.create(req.params.adminID, req.params.nombre, req.params.descrip, req.params.stock, req.params.priceU, req.params.idImage));
+        res.status(200).send($$Producto.create(req.params.adminID, req.params.nombre, req.params.descrip, req.params.stock, req.params.priceU));
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
@@ -168,6 +171,100 @@ server.get('/deleteServicio/:adminID/:id', function (req, res) {
     }
 });
 // FIN - SERVICIO
+
+// DIALOGO
+server.get('/createDialogo/:idUsuario/:idServicio/:mensaje', function (req, res) {
+    try {
+        res.status(200).send($$Dialogo.create(req.params.idUsuario, req.params.idServicio, req.params.mensaje));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/readDialogo/:idServicio', function (req, res) {
+    try {
+        res.status(200).send($$Dialogo.read(req.params.idServicio));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/deleteDialogo/:idServicio', function (req, res) {
+    try {
+        res.status(200).send($$Dialogo.delete(req.params.idServicio));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+// FIN - DIALOGO
+
+// ActService
+server.get('/createActService/:idServicio/:mensaje', function (req, res) {
+    try {
+        res.status(200).send($$ActService.create(req.params.idServicio, req.params.mensaje));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/readActService/:idServicio', function (req, res) {
+    try {
+        res.status(200).send($$ActService.read(req.params.idServicio));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/deleteActService/:idServicio', function (req, res) {
+    try {
+        res.status(200).send($$ActService.delete(req.params.idServicio));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+// FIN - ActService
+
+// Categoria
+server.get('/createCategoria/:idProducto/:tipo', function (req, res) {
+    try {
+        res.status(200).send($$Categoria.create(req.params.idProducto, req.params.tipo));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/readCategoria/:idProducto', function (req, res) {
+    try {
+        res.status(200).send($$Categoria.read(req.params.idProducto));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/updateCategoria/:tipo/:id', function (req, res) {
+    try {
+        res.status(200).send($$Categoria.update(req.params.tipo, req.params.id));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/deleteCategoria/:id', function (req, res) {
+    try {
+        res.status(200).send($$Categoria.delete(req.params.id));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/deleteAllCategoria/:idProducto', function (req, res) {
+    try {
+        res.status(200).send($$Categoria.deleteAll(req.params.idProducto));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+// FIN - Categoria
 
 server.listen(8080, function () {
     console.log("- - - ONLINE - - -");
