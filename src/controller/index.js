@@ -10,6 +10,8 @@ import $$Servicio from '../models/Servicio.js';
 import $$Dialogo from '../models/Dialogo.js';
 import $$ActService from '../models/ActService.js';
 import $$Categoria from '../models/Categoria.js';
+import $$Factura from '../models/Factura.js';
+import $$FacturaProducto from '../models/Factura-Producto.js';
 
 server.use(bodyParser.raw({ type: 'application/octet-stream', limit: '500mb' }));
 server.use(express.json({ limit: '500mb' }));
@@ -17,6 +19,58 @@ server.use(cors());
 server.use(express.urlencoded({ extended: true }));
 
 server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'views')));
+
+// Factura-Producto
+server.get('/createFacturaProducto/:adminID/:idFactura/:idProducto/:cantidad/:precioTotal', function (req, res) {
+    try {
+        res.status(200).send($$FacturaProducto.create(req.params.adminID, req.params.idFactura, req.params.idProducto, req.params.cantidad, req.params.precioTotal));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/readFacturaProducto/:idFactura', function (req, res) {
+    try {
+        res.status(200).send($$FacturaProducto.read(req.params.idFactura));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+// FIN - Factura-Producto
+
+// Factura
+server.get('/createFactura/:adminID/:idEmisor/:nombreVendedor/:idRemitente/:precioTotal', function (req, res) {
+    try {
+        res.status(200).send($$Factura.create(req.params.adminID, req.params.idEmisor, req.params.nombreVendedor, req.params.idRemitente, req.params.precioTotal));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/readFactura/:idRemitente', function (req, res) {
+    try {
+        res.status(200).send($$Factura.read(req.params.idRemitente));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/getFactura/:id', function (req, res) {
+    try {
+        res.status(200).send($$Factura.get(req.params.id));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/deleteFactura/:adminID/:id', function (req, res) {
+    try {
+        res.status(200).send($$Factura.delete(req.params.adminID, req.params.id));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+// FIN - Factura
 
 // USUARIO
 server.get('/loginUser/:user/:pass', function (req, res) {

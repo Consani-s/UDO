@@ -3,11 +3,19 @@ import sqlite from 'better-sqlite3';
 const db = new sqlite('../controller/database.db');
 
 db.prepare(
-    'CREATE TABLE IF NOT EXISTS Usuario' +
-    '(id INTEGER PRIMARY KEY AUTOINCREMENT, ced TEXT, num TEXT, usuario TEXT UNIQUE, pass TEXT, type INTEGER)').run();
+    `CREATE TABLE IF NOT EXISTS Usuario 
+    (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    ced TEXT,
+    nombreCompleto TEXT, 
+    num TEXT, 
+    usuario TEXT UNIQUE, 
+    pass TEXT, 
+    type INTEGER
+    )`).run();
 
 function comprobarAdmin(adminID) {
-    let json = db.prepare(`SELECT * FROM Usuario WHERE id = ? AND type = 1`).get(adminID);
+    let json = db.prepare(`SELECT * FROM Usuario WHERE id = ? AND type = 2`).get(adminID);
     return (json != null);
 }
 

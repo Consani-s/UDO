@@ -3,13 +3,15 @@ import sqlite from 'better-sqlite3';
 const db = new sqlite('../controller/database.db');
 
 db.prepare(`CREATE TABLE IF NOT EXISTS Imagen 
-    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
     data BLOB, 
     idProducto INTEGER, 
-    FOREIGN KEY (idProducto) REFERENCES Producto(id) ON DELETE CASCADE)`).run();
+    FOREIGN KEY (idProducto) REFERENCES Producto(id) ON DELETE CASCADE
+    )`).run();
 
 function comprobarAdmin(adminID) {
-    let json = db.prepare(`SELECT * FROM Usuario WHERE id = ? AND type = 1`).get(adminID);
+    let json = db.prepare(`SELECT * FROM Usuario WHERE id = ? AND type = 2`).get(adminID);
     return (json != null);
 }
 

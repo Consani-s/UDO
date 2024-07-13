@@ -3,7 +3,8 @@ import sqlite from 'better-sqlite3';
 const db = new sqlite('../controller/database.db');
 
 db.prepare(`CREATE TABLE IF NOT EXISTS Servicio
-    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+    (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     idUsuario INTEGER, 
     tipo TEXT, 
     fechaInicial TEXT, 
@@ -14,8 +15,8 @@ db.prepare(`CREATE TABLE IF NOT EXISTS Servicio
     )`).run();
 
 function comprobarAdmin(adminID) {
-    let json = db.prepare(`SELECT * FROM Usuario WHERE id = ? AND type = 1`).get(adminID);
-    return (json != null);
+    let json = db.prepare(`SELECT * FROM Usuario WHERE id = ?`).get(adminID);
+    return json.type;
 }
 
 export default class $$Servicio {
@@ -37,14 +38,14 @@ export default class $$Servicio {
     }
 
     static update(idUsuario, tipo, fechaInicial, fechaFinal, estado, precioAcumulado, id) {
-        if (!comprobarAdmin(adminID)) throw new Error('No tienes permisos.');
+        if (comprobarAdmin(adminID) < 1) throw new Error('No tienes permisos.');
         let res = db.prepare(`UPDATE Servicio SET idUsuario = ?, tipo = ?, fechaInicial = ?, fechaFinal = ?, estado = ?, precioAcumulado = ? WHERE id = ?`).run(idUsuario, tipo, fechaInicial, fechaFinal, estado, precioAcumulado, id);
         return res;
 
     }
 
     static delete(adminID, id) {
-        if (!comprobarAdmin(adminID)) throw new Error('No tienes permisos.');
+        if (comprobarAdmin(adminID) < 2) throw new Error('No tienes permisos.');
         db.prepare(`DELETE FROM Servicio WHERE id = ?`).run(id);
         return { 'message': 'OK' };
     }

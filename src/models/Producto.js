@@ -3,14 +3,16 @@ import sqlite from 'better-sqlite3';
 const db = new sqlite('../controller/database.db');
 
 db.prepare(`CREATE TABLE IF NOT EXISTS Producto
-    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
     nombre TEXT, 
     descrip TEXT, 
     stock INTEGER, 
-    priceU INTEGER)`).run();
+    priceU INTEGER
+    )`).run();
 
 function comprobarAdmin(adminID) {
-    let json = db.prepare(`SELECT * FROM Usuario WHERE id = ? AND type = 1`).get(adminID);
+    let json = db.prepare(`SELECT * FROM Usuario WHERE id = ? AND type = 2`).get(adminID);
     return (json != null);
 }
 
