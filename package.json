@@ -12,7 +12,9 @@
   "dependencies": {
     "better-sqlite3": "^11.1.2",
     "body-parser": "^1.20.2",
+    "chalk": "^5.3.0",
     "cors": "^2.8.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "pdfkit-table": "^0.1.99"
   }
 }

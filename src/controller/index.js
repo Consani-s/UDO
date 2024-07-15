@@ -3,6 +3,8 @@ const server = express();
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import path from 'path';
+import PDFDocument from 'pdfkit-table'
+
 import $$Usuario from '../models/Usuario.js';
 import $$Producto from '../models/Producto.js';
 import $$Imagen from '../models/Imagen.js';
@@ -19,6 +21,38 @@ server.use(cors());
 server.use(express.urlencoded({ extended: true }));
 
 server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'views')));
+
+server.get('/pdf', function(req, res){
+    const doc = new PDFDocument();
+
+    res.writeHead(200, {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": "attachment; filename=res.pdf"
+    });
+
+    doc.pipe();
+
+     // Datos para la tabla
+     const table = {
+        headers: ['ID', 'Nombre', 'Edad', 'Ciudad'],
+        rows: [
+            ['1', 'Andrés', '25', 'Caracas'],
+            ['2', 'María', '30', 'Madrid'],
+            ['3', 'Juan', '28', 'Buenos Aires'],
+            // Puedes añadir más filas aquí
+        ],
+    };
+
+    // Añadir la tabla al documento PDF
+    doc.table(table, {
+        prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
+        prepareRow: (row, i) => doc.font('Helvetica').fontSize(10),
+    });
+    // Añadir contenido al PDF
+    doc.text('Hola, este es un archivo PDF.');
+
+    doc.end();
+});
 
 // Factura-Producto
 server.get('/createFacturaProducto/:adminID/:idFactura/:idProducto/:cantidad/:precioTotal', function (req, res) {
