@@ -14,6 +14,12 @@ db.prepare(`CREATE TABLE IF NOT EXISTS Servicio
     FOREIGN KEY (idUsuario) REFERENCES Usuario(id)
     )`).run();
 
+    try{
+        db.prepare(`INSERT INTO Servicio (id, idUsuario, tipo, fechaInicial, fechaFinal, estado, precioAcumulado) VALUES(?, ?, ?, ?, ?, ?, ?)`).run(1, 1, 'RESERVA', '00-00-0000', '00-00-0000', 'ENTREGADO', 200);
+    } catch{
+        console.log('Ya existe.');
+    }
+
 function comprobarAdmin(adminID) {
     let json = db.prepare(`SELECT * FROM Usuario WHERE id = ?`).get(adminID);
     return json.type;
@@ -22,8 +28,9 @@ function comprobarAdmin(adminID) {
 export default class $$Servicio {
 
     static create(idUsuario, tipo, fechaInicial, fechaFinal, estado) {
-        db.prepare(`INSERT INTO Servicio (idUsuario, tipo, fechaInicial, fechaFinal, estado, precioAcumulado) VALUES(?, ?, ?, ?, ?, ?)`).run(idUsuario, tipo, fechaInicial, fechaFinal, estado, 0);
-        return { 'message': 'OK' };
+        let res;
+        res = db.prepare(`INSERT INTO Servicio (idUsuario, tipo, fechaInicial, fechaFinal, estado, precioAcumulado) VALUES(?, ?, ?, ?, ?, ?)`).run(idUsuario, tipo, fechaInicial, fechaFinal, estado, 0);
+        return { 'id': res.lastInsertRowid };
     }
 
     static read(idUsuario) {
@@ -37,7 +44,12 @@ export default class $$Servicio {
         return res;
     }
 
-    static update(idUsuario, tipo, fechaInicial, fechaFinal, estado, precioAcumulado, id) {
+    static get(id) {
+        let res = db.prepare(`SELECT * FROM Servicio WHERE id = ?`).get(id);
+        return res;
+    }
+
+    static update(adminID, idUsuario, tipo, fechaInicial, fechaFinal, estado, precioAcumulado, id) {
         if (comprobarAdmin(adminID) < 1) throw new Error('No tienes permisos.');
         let res = db.prepare(`UPDATE Servicio SET idUsuario = ?, tipo = ?, fechaInicial = ?, fechaFinal = ?, estado = ?, precioAcumulado = ? WHERE id = ?`).run(idUsuario, tipo, fechaInicial, fechaFinal, estado, precioAcumulado, id);
         return res;

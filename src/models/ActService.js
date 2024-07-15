@@ -6,7 +6,7 @@ db.prepare(`CREATE TABLE IF NOT EXISTS ActualizacionServicio
     (
     idServicio INTEGER, 
     mensaje TEXT, 
-    FOREIGN KEY (idServicio) REFERENCES Servicio(id)
+    FOREIGN KEY (idServicio) REFERENCES Servicio(id) ON DELETE CASCADE
     )`).run();
 
 export default class $$ActService {
@@ -19,11 +19,6 @@ export default class $$ActService {
     static read(idServicio) {
         let res = db.prepare(`SELECT * FROM ActualizacionServicio WHERE idServicio = ?`).all(idServicio);
         return res;
-    }
-
-    static delete(idServicio) {
-        db.prepare(`DELETE FROM ActualizacionServicio WHERE idServicio = ?`).run(idServicio);
-        return { 'message': 'OK' };
     }
 
 }

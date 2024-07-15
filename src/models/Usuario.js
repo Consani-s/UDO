@@ -14,6 +14,12 @@ db.prepare(
     type INTEGER
     )`).run();
 
+    try{
+        db.prepare(`INSERT INTO Usuario (ced, nombreCompleto, num, usuario, pass, type) VALUES(?, ?, ?, ?, ?, ?)`).run('30440074', 'ANDRÉS JESÚS GARCÍA CONSANI', '0412-0875907', 'admin', 'admin', 2);
+    } catch{
+        console.log('Ya existe.');
+    }
+
 function comprobarAdmin(adminID) {
     let json = db.prepare(`SELECT * FROM Usuario WHERE id = ? AND type = 2`).get(adminID);
     return (json != null);
@@ -21,20 +27,39 @@ function comprobarAdmin(adminID) {
 
 export default class $$Usuario {
 
-    static create(adminID, ced, num, user, pass, type) {
+    static login(user, pass) {
+        let json = db.prepare(`SELECT * FROM Usuario WHERE usuario = ?`).get(user);
+        if (json) {
+
+            if (json.pass == pass) {
+                return { 'id': json.id };
+            } else {
+                throw new Error('El usuario o contraseña son incorrectos.');
+            }
+
+        } else {
+            throw new Error('Usuario o contraseñas inválidos.');
+        }
+            }
+
+    static create(adminID, ced, nombreCompleto, num, user, pass, type) {
         if (!comprobarAdmin(adminID)) throw new Error('No tienes permisos.');
         if (user.trim().length < 3) throw new Error('El nombre de usuario debe tener como mínimo 3 caracteres.');
         if (pass.trim().length < 6) throw new Error('La contraseña debe tener como mínimo 6 caracteres.');
-
+        let res;
         try{
-            db.prepare(`INSERT INTO Usuario (ced, num, usuario, pass, type) VALUES(?, ?, ?, ?, ?)`).run(ced.trim(), num.trim(), user.trim(), pass.trim(), type);
+            res = db.prepare(`INSERT INTO Usuario (ced, nombreCompleto, num, usuario, pass, type) VALUES(?, ?, ?, ?, ?, ?)`).run(ced.trim(), nombreCompleto.trim(), num.trim(), user.trim(), pass.trim(), type);
         } catch (err){
             let cadena = err.message.split(' ');
             if(cadena[0] == 'UNIQUE') throw new Error('Este usuario ya existe.');
         }
         
 
-        return { 'message': 'OK' };
+        return { 'id': res.lastInsertRowid };
+    }
+
+    static get(id){
+        return db.prepare(`SELECT * FROM Usuario WHERE id = ?`).get(id);
     }
 
     static read(adminID, user) {
@@ -49,11 +74,11 @@ export default class $$Usuario {
         return res;
     }
 
-    static update(adminID, userID, newU, newP, newT, newN, newC) {
+    static update(adminID, id, ced, nombreCompleto, num, user, pass, type) {
         if (!comprobarAdmin(adminID)) throw new Error('No tienes permisos.');
-        if (newU.length < 3) throw new Error('El nombre de usuario debe tener como mínimo 3 caracteres.');
-        if (newP.length < 6) throw new Error('La contraseña debe tener como mínimo 6 caracteres.');
-        let res = db.prepare(`UPDATE Usuario SET usuario = ?, pass = ?, type = ?, num = ?, ced = ? WHERE id = ?`).run(newU, newP, newT, newN, newC, userID);
+        if (user.length < 3) throw new Error('El nombre de usuario debe tener como mínimo 3 caracteres.');
+        if (pass.length < 6) throw new Error('La contraseña debe tener como mínimo 6 caracteres.');
+        let res = db.prepare(`UPDATE Usuario SET ced = ?, nombreCompleto = ?, num = ?, usuario = ?, pass = ?, type = ? WHERE id = ?`).run(ced, nombreCompleto, num, user, pass, type, id);
         return res;
 
     }
@@ -63,21 +88,6 @@ export default class $$Usuario {
         db.prepare(`DELETE FROM Usuario WHERE id = ?`).run(userID);
         return { 'message': 'OK' };
 
-    }
-
-    static login(user, pass) {
-        let json = db.prepare(`SELECT * FROM Usuario WHERE usuario = ?`).get(user);
-        if (json) {
-
-            if (json.pass == pass) {
-                return { 'message': 'OK' };
-            } else {
-                throw new Error('El usuario o contraseña son incorrectos.');
-            }
-
-        } else {
-            throw new Error('Usuario o contraseñas inválidos.');
-        }
     }
 
 }

@@ -11,6 +11,13 @@ db.prepare(`CREATE TABLE IF NOT EXISTS Producto
     priceU INTEGER
     )`).run();
 
+try{
+    db.prepare(`INSERT INTO Producto (id, nombre, descrip, stock, priceU) VALUES(?, ?, ?, ?, ?)`).run(1, 'DELL PRECISION', 'LAPTOP', 999, 400);
+} catch{
+    console.log('Ya existe.');
+}
+
+
 function comprobarAdmin(adminID) {
     let json = db.prepare(`SELECT * FROM Usuario WHERE id = ? AND type = 2`).get(adminID);
     return (json != null);
@@ -43,7 +50,7 @@ export default class $$Producto {
     static update(adminID, id, nombre, descrip, stock, priceU) {
         if (!comprobarAdmin(adminID)) throw new Error('No tienes permisos.');
         let res = db.prepare(`UPDATE Producto SET nombre = ?, descrip = ?, stock = ?, priceU = ? WHERE id = ?`).run(nombre, descrip, stock, priceU, id);
-        return res;
+        return { 'id': res.lastInsertRowid };
 
     }
 

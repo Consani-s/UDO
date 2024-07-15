@@ -14,6 +14,12 @@ db.prepare(`CREATE TABLE IF NOT EXISTS Factura
     FOREIGN KEY (idRemitente) REFERENCES Usuario(id)
     )`).run();
 
+    try{
+        db.prepare(`INSERT INTO Factura (id, fecha, idEmisor, nombreVendedor, idRemitente, precioTotal) VALUES(?, ?, ?, ?, ?, ?)`).run(1, '00-00-0000', 1, 'PRUEBA', 1, 1000);
+    } catch{
+        console.log('Ya existe.');
+    }
+
     function comprobarAdmin(adminID) {
         let json = db.prepare(`SELECT * FROM Usuario WHERE id = ?`).get(adminID);
         return json.type;
@@ -24,7 +30,7 @@ export default class $$Factura {
     static create(adminID, idEmisor, nombreVendedor, idRemitente, precioTotal) {
         if (comprobarAdmin(adminID) < 1) throw new Error('No tienes permisos.');
         let fecha = new Date();
-        let fechaActual = fecha.getDate() + '-' + fecha.getMonth() + '-' + fecha.getFullYear()
+        let fechaActual = fecha.getDate() + '-' + (fecha.getMonth() + 1) + '-' + fecha.getFullYear()
         let id = db.prepare(`INSERT INTO Factura (fecha, idEmisor, nombreVendedor, idRemitente, precioTotal) VALUES(?, ?, ?, ?, ?)`).run(fechaActual, idEmisor, nombreVendedor, idRemitente, precioTotal);
         return { 'id': id.lastInsertRowid };
     }

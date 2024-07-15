@@ -24,12 +24,6 @@ export default class $$Imagen {
         return { 'id': res.lastInsertRowid };
     }
 
-    static update(adminID, idProducto, id){
-        if (!comprobarAdmin(adminID)) throw new Error('No tienes permisos.');
-        let res = db.prepare(`UPDATE Imagen SET idProducto = ? WHERE id = ?`).run(idProducto, id);
-        return {'res': res.changes};
-    }
-
     static read(id) {
         let res = db.prepare(`SELECT * FROM Imagen WHERE idProducto = ?`).get(id);
         return res.data;

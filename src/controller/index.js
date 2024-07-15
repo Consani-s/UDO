@@ -81,9 +81,17 @@ server.get('/loginUser/:user/:pass', function (req, res) {
     }
 });
 
-server.get('/createUsuario/:adminID/:ced/:num/:user/:pass/:type', function (req, res) {
+server.get('/getUsuario/:id', function (req, res) {
     try {
-        res.status(200).send($$Usuario.create(req.params.adminID, req.params.ced, req.params.num, req.params.user, req.params.pass, req.params.type));
+        res.status(200).send($$Usuario.get(req.params.id));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/createUsuario/:adminID/:ced/:nombreCompleto/:num/:user/:pass/:type', function (req, res) {
+    try {
+        res.status(200).send($$Usuario.create(req.params.adminID, req.params.ced, req.params.nombreCompleto, req.params.num, req.params.user, req.params.pass, req.params.type));
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
@@ -97,9 +105,9 @@ server.get('/readUsuario/:adminID/:user', function (req, res) {
     }
 });
 
-server.get('/updateUsuario/:adminID/:userID/:newU/:newP/:newT/:newN/:newC', function (req, res) {
+server.get('/updateUsuario/:adminID/:id/:ced/:nombreCompleto/:num/:user/:pass/:type', function (req, res) {
     try {
-        res.status(200).send($$Usuario.update(req.params.adminID, req.params.userID, req.params.newU, req.params.newP, req.params.newT, req.params.newN, req.params.newC));
+        res.status(200).send($$Usuario.update(req.params.adminID, req.params.id, req.params.ced, req.params.nombreCompleto, req.params.num, req.params.user, req.params.pass, req.params.type));
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
@@ -156,20 +164,10 @@ server.get('/deleteProducto/:adminID/:id', function (req, res) {
 });
 // FIN - PRODUCTO
 
-// IMAGENE
+// IMAGEN
 server.post('/createImagen/:adminID', function (req, res) {
     try {
-        console.log(req.params.adminID);
-        console.log(req.body);
         res.status(200).send($$Imagen.create(req.params.adminID, req.body));
-    } catch (error) {
-        res.status(400).send({ 'message': error.message });
-    }
-});
-
-server.get('/updateImagen/:adminID/:idProducto/:id', function (req, res) {
-    try {
-        res.status(200).send($$Imagen.update(req.params.adminID, req.params.idProducto, req.params.id));
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
@@ -190,7 +188,7 @@ server.get('/deleteImagen/:adminID/:id', function (req, res) {
         res.status(400).send({ 'message': error.message });
     }
 });
-// FIN - IMAGENE
+// FIN - IMAGEN
 
 // SERVICIO
 server.get('/createServicio/:idUsuario/:tipo/:fechaInicial/:fechaFinal/:estado', function (req, res) {
@@ -209,9 +207,17 @@ server.get('/readServicio/:idUsuario', function (req, res) {
     }
 });
 
-server.get('/updateServicio/:idUsuario/:tipo/:fechaInicial/:fechaFinal/:estado/:precioAcumulado/:id', function (req, res) {
+server.get('/getServicio/:id', function (req, res) {
     try {
-        res.status(200).send($$Servicio.update(req.params.idUsuario, req.params.tipo, req.params.fechaInicial, req.params.fechaFinal, req.params.estado, req.params.precioAcumulado, req.params.id));
+        res.status(200).send($$Servicio.get(req.params.id));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/updateServicio/:adminID/:idUsuario/:tipo/:fechaInicial/:fechaFinal/:estado/:precioAcumulado/:id', function (req, res) {
+    try {
+        res.status(200).send($$Servicio.update(req.params.adminID, req.params.idUsuario, req.params.tipo, req.params.fechaInicial, req.params.fechaFinal, req.params.estado, req.params.precioAcumulado, req.params.id));
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
@@ -242,14 +248,6 @@ server.get('/readDialogo/:idServicio', function (req, res) {
         res.status(400).send({ 'message': error.message });
     }
 });
-
-server.get('/deleteDialogo/:idServicio', function (req, res) {
-    try {
-        res.status(200).send($$Dialogo.delete(req.params.idServicio));
-    } catch (error) {
-        res.status(400).send({ 'message': error.message });
-    }
-});
 // FIN - DIALOGO
 
 // ActService
@@ -267,15 +265,7 @@ server.get('/readActService/:idServicio', function (req, res) {
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
-});
-
-server.get('/deleteActService/:idServicio', function (req, res) {
-    try {
-        res.status(200).send($$ActService.delete(req.params.idServicio));
-    } catch (error) {
-        res.status(400).send({ 'message': error.message });
-    }
-});
+    });
 // FIN - ActService
 
 // Categoria

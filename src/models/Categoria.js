@@ -13,8 +13,8 @@ db.prepare(`CREATE TABLE IF NOT EXISTS Categoria
 export default class $$Categoria {
 
     static create(idProducto, tipo) {
-        db.prepare(`INSERT INTO Categoria (idProducto, tipo) VALUES(?, ?)`).run(idProducto, tipo);
-        return { 'message': 'OK' };
+        let res = db.prepare(`INSERT INTO Categoria (idProducto, tipo) VALUES(?, ?)`).run(idProducto, tipo);
+        return { 'id': res.lastInsertRowid };
     }
 
     static read(idProducto) {
@@ -23,8 +23,8 @@ export default class $$Categoria {
     }
 
     static update(tipo, id) {
-        let res = db.prepare(`UPDATE Categoria SET tipo = ? WHERE id = ?`).all(tipo, id);
-        return res;
+        db.prepare(`UPDATE Categoria SET tipo = ? WHERE id = ?`).run(tipo, id);
+        return { 'message': 'OK' };
     }
 
     static delete(id) {
@@ -33,7 +33,7 @@ export default class $$Categoria {
     }
 
     static deleteAll(idProducto) {
-        db.prepare(`DELETE FROM Categoria WHERE idProducto = ?`).run(id);
+        db.prepare(`DELETE FROM Categoria WHERE idProducto = ?`).run(idProducto);
         return { 'message': 'OK' };
     }
 

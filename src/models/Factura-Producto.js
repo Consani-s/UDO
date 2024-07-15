@@ -21,8 +21,8 @@ export default class $$FacturaProducto {
 
     static create(adminID, idFactura, idProducto, cantidad, precioTotal) {
         if (comprobarAdmin(adminID) < 1) throw new Error('No tienes permisos.');
-        let id = db.prepare(`INSERT INTO FacturaProducto (idFactura, idProducto, cantidad, precioTotal) VALUES(?, ?, ?, ?)`).run(idFactura, idProducto, cantidad, precioTotal);
-        return { 'id': id.lastInsertRowid };
+        db.prepare(`INSERT INTO FacturaProducto (idFactura, idProducto, cantidad, precioTotal) VALUES(?, ?, ?, ?)`).run(idFactura, idProducto, cantidad, precioTotal);
+        return { 'message': 'OK' };
     }
 
     static read(idFactura) {
