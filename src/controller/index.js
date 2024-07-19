@@ -1,9 +1,11 @@
+let inicio = new Date();
 import express from 'express';
 const server = express();
-import cors from 'cors';
 import bodyParser from 'body-parser';
-import path from 'path';
 import PDFDocument from 'pdfkit-table'
+import path from 'path';
+import cors from 'cors';
+import chalk from 'chalk';
 
 import $$Usuario from '../models/Usuario.js';
 import $$Producto from '../models/Producto.js';
@@ -20,44 +22,160 @@ server.use(express.json({ limit: '500mb' }));
 server.use(cors());
 server.use(express.urlencoded({ extended: true }));
 
+server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'examples')));
 server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'views')));
+server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'views', 'scripts')));
+server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'views', 'intranet')));
+server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'img')));
 
-server.get('/pdf', function(req, res){
+server.get('/pdf/:tipo', function (req, res) {
     const doc = new PDFDocument();
+    doc.pipe(res);
 
-    res.writeHead(200, {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": "attachment; filename=res.pdf"
-    });
+    let usuarios = [];
+    if (req.params.tipo == 'cliente') {
+        fetch(`http://localhost:8080/readUsuario/1/-1`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(element => {
+                    usuarios.push(element)
+                });
+                return usuarios;
+            })
+            .then(async usuarios => {
+                let facturas = [];
+                for (let i = 0; i < usuarios.length; i++) {
+                    await fetch(`http://localhost:8080/readFactura/${encodeURIComponent(usuarios[i].id)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            facturas.push(data.length);
+                        })
+                };
+                return facturas;
+            })
+            .then(facturas => {
+                let cambios = 0;
+                do {
+                    cambios = 0;
+                    if (usuarios.length == 1) break;
+                    for (let i = 0; i < (usuarios.length - 1); i++) {
+                        if (facturas[i] < facturas[i + 1]) {
+                            let aux = facturas[i + 1];
+                            facturas[i + 1] = facturas[i];
+                            facturas[i] = aux;
+                            aux = usuarios[i + 1];
+                            usuarios[i + 1] = usuarios[i];
+                            usuarios[i] = aux;
+                            cambios++;
+                        }
+                    }
+                } while (cambios > 0);
 
-    doc.pipe();
+                let rows = [];
+                for (let i = 0; i < usuarios.length; i++) {
+                    rows.push([usuarios[i].id, usuarios[i].ced, usuarios[i].nombreCompleto, usuarios[i].num, usuarios[i].type, facturas[i]])
+                }
 
-     // Datos para la tabla
-     const table = {
-        headers: ['ID', 'Nombre', 'Edad', 'Ciudad'],
-        rows: [
-            ['1', 'Andrés', '25', 'Caracas'],
-            ['2', 'María', '30', 'Madrid'],
-            ['3', 'Juan', '28', 'Buenos Aires'],
-            // Puedes añadir más filas aquí
-        ],
-    };
+                doc.text('CLIENTES CON MÁS FACTURAS.');
 
-    // Añadir la tabla al documento PDF
-    doc.table(table, {
-        prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
-        prepareRow: (row, i) => doc.font('Helvetica').fontSize(10),
-    });
-    // Añadir contenido al PDF
-    doc.text('Hola, este es un archivo PDF.');
+                doc.moveDown();
+                const table = {
+                    headers: ['ID', 'Cédula', 'Nombre', 'Número', 'Tipo', 'N° Facturas'],
+                    rows: rows,
+                };
 
-    doc.end();
+                doc.table(table, {
+                    prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
+                    prepareRow: (row, i) => doc.font('Helvetica').fontSize(10),
+                });
+                
+                doc.end();
+            })
+            .catch(error => console.error(chalk.red(`⚠️ ` + `ERROR EN LA LECTURA: ` + error)));
+    } else if (req.params.tipo == 'producto'){
+        let productos = [];
+        fetch(`http://localhost:8080/readProducto/-1`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(element => {
+                    productos.push(element)
+                });
+                return productos;
+            })
+            .then(async lista => {
+                let cantidades = [];
+                for (let i = 0; i < lista.length; i++){
+                    await fetch(`http://localhost:8080/readFacturaProductoProducto/${lista[i].id}`)
+                    .then(response => response.json())
+                    .then(element => {
+                        element.forEach(element => {
+                            cantidades[i] = cantidades[i] + element.cantidad;
+                        })
+                    });
+                }
+                return {'productos': lista, 'cantidades':cantidades}
+            })
+            .then(data => {
+                let cambios = 0;
+                do {
+                    cambios = 0;
+                    if (data.productos.length == 1) break;
+                    for (let i = 0; i < (data.productos.length - 1); i++) {
+                        if (data.cantidades[i] < data.cantidades[i + 1]) {
+                            let aux = data.cantidades[i + 1];
+                            data.cantidades[i + 1] = data.cantidades[i];
+                            data.cantidades[i] = aux;
+                            aux = data.productos[i + 1];
+                            data.productos[i + 1] = data.productos[i];
+                            data.productos[i] = aux;
+                            cambios++;
+                        }
+                    }
+                } while (cambios > 0);
+                
+                let rows = [];
+                for (let i = 0; i < data.productos.length; i++) {
+                        rows.push([data.productos[i].id, 
+                            data.productos[i].nombre, 
+                            data.productos[i].descrip, 
+                            data.productos[i].stock, 
+                            data.productos[i].priceU, 
+                            data.cantidades[i]]);
+                }
+
+                doc.text('PRODUCTOS MÁS VENDIDOS.');
+
+                doc.moveDown();
+                const table = {
+                    headers: ['ID', 'Nombre', 'Descripción', 'Stock', 'Precio c/u', 'N° Ventas'],
+                    rows: rows,
+                };
+
+                doc.table(table, {
+                    prepareHeader: () => doc.font('Helvetica-Bold').fontSize(12),
+                    prepareRow: (row, i) => doc.font('Helvetica').fontSize(10),
+                });
+
+                doc.end();
+            })
+        } else {
+            res.status(400).send('Error en el tipo de reporte.')
+        }
+    //localhost:8080/pdf/cliente
 });
 
 // Factura-Producto
 server.get('/createFacturaProducto/:adminID/:idFactura/:idProducto/:cantidad/:precioTotal', function (req, res) {
     try {
         res.status(200).send($$FacturaProducto.create(req.params.adminID, req.params.idFactura, req.params.idProducto, req.params.cantidad, req.params.precioTotal));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/readFacturaProductoProducto/:idProducto', function (req, res) {
+    try {
+        res.status(200).send($$FacturaProducto.readProducto(req.params.idProducto));
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
@@ -299,7 +417,7 @@ server.get('/readActService/:idServicio', function (req, res) {
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
-    });
+});
 // FIN - ActService
 
 // Categoria
@@ -345,5 +463,9 @@ server.get('/deleteAllCategoria/:idProducto', function (req, res) {
 // FIN - Categoria
 
 server.listen(8080, function () {
-    console.log("- - - ONLINE - - -");
+    console.log(chalk.gray.bold('-------------------  SERVER -------------------'));
+    console.log(chalk.yellow.bold('✔️ ') + chalk.green.italic('EL SERVIDOR SE EJECUTÓ EXITOSAMENTE'));
+    console.log(chalk.yellow.bold('✔️ ') + chalk.green.italic('SE REALIZÓ LA CONEXIÓN AL SERVIDOR SIN ERRORES'));
+    console.log(`${chalk.yellow('Time: ')}` + (new Date() - inicio) + 'ms');
+    console.log(chalk.gray.bold('-------------------  SERVER -------------------'));
 })

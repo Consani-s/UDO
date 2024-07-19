@@ -30,4 +30,10 @@ export default class $$FacturaProducto {
         return res;
     }
 
+    static readProducto(idProducto) {
+        let res = db.prepare(`SELECT * FROM FacturaProducto WHERE idProducto = ?`).all(idProducto);
+        console.log(res);
+        return res;
+    }
+
 }
