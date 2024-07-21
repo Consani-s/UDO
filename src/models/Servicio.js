@@ -33,9 +33,10 @@ export default class $$Servicio {
         return { 'id': res.lastInsertRowid };
     }
 
-    static read(idUsuario) {
+    static read(adminID, idUsuario) {
         let res;
         if (idUsuario == -1) {
+            if (comprobarAdmin(adminID) < 1) throw new Error('No tienes permisos.');
             res = db.prepare(`SELECT * FROM Servicio`).all();
         } else {
             res = db.prepare(`SELECT * FROM Servicio WHERE idUsuario = ?`).all(idUsuario);

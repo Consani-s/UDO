@@ -6,7 +6,7 @@ db.prepare(
     `CREATE TABLE IF NOT EXISTS Usuario 
     (
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
-    ced TEXT,
+    ced TEXT UNIQUE,
     nombreCompleto TEXT, 
     num TEXT, 
     usuario TEXT UNIQUE, 
@@ -58,17 +58,21 @@ export default class $$Usuario {
         return { 'id': res.lastInsertRowid };
     }
 
+    static getByCed(ced){
+        return db.prepare(`SELECT * FROM Usuario WHERE ced = ?`).get(ced);
+    }
+
     static get(id){
         return db.prepare(`SELECT * FROM Usuario WHERE id = ?`).get(id);
     }
 
-    static read(adminID, user) {
-        let res
+    static read(adminID, nombreCompleto) {
+        let res;
         if (!comprobarAdmin(adminID)) throw new Error('No tienes permisos.');
-        if(user == -1){
+        if(nombreCompleto == -1){
             res = db.prepare(`SELECT * FROM Usuario`).all();
         } else {
-            res = db.prepare(`SELECT * FROM Usuario WHERE usuario LIKE ?`).all(`%${user}%`);
+            res = db.prepare(`SELECT * FROM Usuario WHERE nombreCompleto LIKE ?`).all(`%${nombreCompleto}%`);
         }
         
         return res;

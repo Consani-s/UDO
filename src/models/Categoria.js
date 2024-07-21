@@ -18,6 +18,7 @@ export default class $$Categoria {
     }
 
     static read(idProducto) {
+        if(idProducto==-1){ let res = db.prepare(`SELECT * FROM Categoria`).all(); return res; }
         let res = db.prepare(`SELECT * FROM Categoria WHERE idProducto = ?`).all(idProducto);
         return res;
     }

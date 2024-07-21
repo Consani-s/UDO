@@ -17,10 +17,12 @@ function comprobarAdmin(adminID) {
 
 export default class $$Imagen {
 
-    static create(adminID, buff) {
-        let buffer = Buffer.from(buff)
+    static create(adminID, arrayBuffer, idProducto) {
+        console.log('---------------------------');
+        console.log(adminID, arrayBuffer, idProducto);
+        let buffer = Buffer.from(arrayBuffer)
         if (!comprobarAdmin(adminID)) throw new Error('No tienes permisos.');
-        let res = db.prepare(`INSERT INTO Imagen (data) VALUES(?)`).run(buffer);
+        let res = db.prepare(`INSERT INTO Imagen (data, idProducto) VALUES(?, ?)`).run(buffer,idProducto);
         return { 'id': res.lastInsertRowid };
     }
 

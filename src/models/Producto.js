@@ -31,6 +31,21 @@ export default class $$Producto {
         return { 'id': id.lastInsertRowid };
     }
 
+    static createWithImage(adminID, nombre, descrip, stock, priceU, arrayBuffer) {
+        console.log(adminID, nombre, descrip, stock, priceU, arrayBuffer);
+        if (!comprobarAdmin(adminID)) throw new Error('No tienes permisos.');
+        let id = db.prepare(`INSERT INTO Producto (nombre, descrip, stock, priceU) VALUES(?, ?, ?, ?)`).run(nombre, descrip, stock, priceU);
+        fetch(`http://localhost:6060/createImagen/1/${id.lastInsertRowid}`, {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/octet-stream'
+            },
+            body: arrayBuffer
+        })
+        .catch(error => console.error(`⚠️ `+ `ERROR EN LA CREACIÓN: ` + error));
+        return { 'id': id.lastInsertRowid };
+    }
+
     static read(nombre) {
         let res;
         if (nombre == -1) {
@@ -38,6 +53,19 @@ export default class $$Producto {
         } else {
             res = db.prepare(`SELECT * FROM Producto WHERE nombre LIKE ?`).all(`%${nombre}%`);
         }
+
+        return res;
+    }
+
+    static readByCategoria(tipo, nombre) {
+        let res;
+        if(tipo == -1 && nombre == -1) {res = db.prepare(`SELECT * FROM Producto`).all(); return res;};
+
+        if (tipo == -1) {res = db.prepare(`SELECT * FROM Producto WHERE nombre LIKE ?`).all(`%${nombre}%`); return res;} 
+
+        if(nombre == -1) {res = db.prepare(`SELECT * FROM Producto JOIN Categoria ON Categoria.tipo = ?`).all(tipo); return res;}
+
+        res = db.prepare(`SELECT * FROM Producto JOIN Categoria ON Categoria.tipo = ? WHERE nombre LIKE ?`).all(tipo, `%${nombre}%`);
 
         return res;
     }

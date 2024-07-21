@@ -24,6 +24,7 @@ server.use(express.urlencoded({ extended: true }));
 
 server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'examples')));
 server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'views')));
+server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'views', 'forms')));
 server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'views', 'scripts')));
 server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'views', 'intranet')));
 server.use(express.static(path.join(import.meta.dirname, '..', 'assets', 'img')));
@@ -34,7 +35,7 @@ server.get('/pdf/:tipo', function (req, res) {
 
     let usuarios = [];
     if (req.params.tipo == 'cliente') {
-        fetch(`http://localhost:8080/readUsuario/1/-1`)
+        fetch(`http://localhost:6060/readUsuario/1/-1`)
             .then(response => response.json())
             .then(data => {
                 data.forEach(element => {
@@ -45,7 +46,7 @@ server.get('/pdf/:tipo', function (req, res) {
             .then(async usuarios => {
                 let facturas = [];
                 for (let i = 0; i < usuarios.length; i++) {
-                    await fetch(`http://localhost:8080/readFactura/${encodeURIComponent(usuarios[i].id)}`)
+                    await fetch(`http://localhost:6060/readFactura/${encodeURIComponent(usuarios[i].id)}`)
                         .then(response => response.json())
                         .then(data => {
                             facturas.push(data.length);
@@ -94,7 +95,7 @@ server.get('/pdf/:tipo', function (req, res) {
             .catch(error => console.error(chalk.red(`⚠️ ` + `ERROR EN LA LECTURA: ` + error)));
     } else if (req.params.tipo == 'producto'){
         let productos = [];
-        fetch(`http://localhost:8080/readProducto/-1`)
+        fetch(`http://localhost:6060/readProducto/-1`)
             .then(response => response.json())
             .then(data => {
                 data.forEach(element => {
@@ -105,11 +106,12 @@ server.get('/pdf/:tipo', function (req, res) {
             .then(async lista => {
                 let cantidades = [];
                 for (let i = 0; i < lista.length; i++){
-                    await fetch(`http://localhost:8080/readFacturaProductoProducto/${lista[i].id}`)
+                    await fetch(`http://localhost:6060/readFacturaProductoProducto/${lista[i].id}`)
                     .then(response => response.json())
                     .then(element => {
+                        if(element.length == 0){cantidades[i] = 0; return;};
                         element.forEach(element => {
-                            cantidades[i] = cantidades[i] + element.cantidad;
+                            cantidades[i] = (cantidades[i] || 0) + element.cantidad;
                         })
                     });
                 }
@@ -161,7 +163,7 @@ server.get('/pdf/:tipo', function (req, res) {
         } else {
             res.status(400).send('Error en el tipo de reporte.')
         }
-    //localhost:8080/pdf/cliente
+    //localhost:6060/pdf/cliente
 });
 
 // Factura-Producto
@@ -241,6 +243,14 @@ server.get('/getUsuario/:id', function (req, res) {
     }
 });
 
+server.get('/getUsuarioByCED/:ced', function (req, res) {
+    try {
+        res.status(200).send($$Usuario.getByCed(req.params.ced));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
 server.get('/createUsuario/:adminID/:ced/:nombreCompleto/:num/:user/:pass/:type', function (req, res) {
     try {
         res.status(200).send($$Usuario.create(req.params.adminID, req.params.ced, req.params.nombreCompleto, req.params.num, req.params.user, req.params.pass, req.params.type));
@@ -283,9 +293,25 @@ server.get('/createProducto/:adminID/:nombre/:descrip/:stock/:priceU', function 
     }
 });
 
+server.post('/createProductoWithImage/:adminID/:nombre/:descrip/:stock/:priceU', function (req, res) {
+    try {
+        res.status(200).send($$Producto.createWithImage(req.params.adminID, req.params.nombre, req.params.descrip, req.params.stock, req.params.priceU, req.body));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
 server.get('/readProducto/:nombre', function (req, res) {
     try {
         res.status(200).send($$Producto.read(req.params.nombre));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
+server.get('/readProductoByCategoria/:tipo/:nombre', function (req, res) {
+    try {
+        res.status(200).send($$Producto.readByCategoria(req.params.tipo, req.params.nombre));
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
@@ -317,9 +343,9 @@ server.get('/deleteProducto/:adminID/:id', function (req, res) {
 // FIN - PRODUCTO
 
 // IMAGEN
-server.post('/createImagen/:adminID', function (req, res) {
+server.post('/createImagen/:adminID/:idProducto', function (req, res) {
     try {
-        res.status(200).send($$Imagen.create(req.params.adminID, req.body));
+        res.status(200).send($$Imagen.create(req.params.adminID, req.body, req.params.idProducto));
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
@@ -351,9 +377,9 @@ server.get('/createServicio/:idUsuario/:tipo/:fechaInicial/:fechaFinal/:estado',
     }
 });
 
-server.get('/readServicio/:idUsuario', function (req, res) {
+server.get('/readServicio/:adminID/:idUsuario', function (req, res) {
     try {
-        res.status(200).send($$Servicio.read(req.params.idUsuario));
+        res.status(200).send($$Servicio.read(req.params.adminID, req.params.idUsuario));
     } catch (error) {
         res.status(400).send({ 'message': error.message });
     }
@@ -462,7 +488,7 @@ server.get('/deleteAllCategoria/:idProducto', function (req, res) {
 });
 // FIN - Categoria
 
-server.listen(8080, function () {
+server.listen(6060, function () {
     console.log(chalk.gray.bold('-------------------  SERVER -------------------'));
     console.log(chalk.yellow.bold('✔️ ') + chalk.green.italic('EL SERVIDOR SE EJECUTÓ EXITOSAMENTE'));
     console.log(chalk.yellow.bold('✔️ ') + chalk.green.italic('SE REALIZÓ LA CONEXIÓN AL SERVIDOR SIN ERRORES'));

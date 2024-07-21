@@ -6,7 +6,7 @@ history.replaceState(null, '', "/login");
 function ingresar() {
     let user = $usuario.value || 'e';
     let pass = $pass.value || 'e';
-    fetch(`http://localhost:6060/loginUser/${encodeURIComponent(user)}/${encodeURIComponent(pass)}`)
+    fetch(`http://localhost:8080/loginUser/${encodeURIComponent(user)}/${encodeURIComponent(pass)}`)
         .then((res) => {
             if (!res.ok) {
                 return res.json().then(error => alert(error.message));

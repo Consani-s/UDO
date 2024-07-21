@@ -14,7 +14,7 @@
     }
 
     .tableCell{
-      width: calc(100%/5);
+      width: calc(100%/7);
     }
 
     .selected {
@@ -84,13 +84,13 @@
                       <a class="opcion nav-link text-light" href="ecommerce.html">Reservas</a>
                     </li>
                     <li class="nav-item">
-                      <a class="opcion nav-link text-light" href="gestion_servicios.html">Servicios</a>
+                      <a class="selected nav-link text-light" href="gestion_servicios.html">Servicios</a>
                     </li>
                     <li class="nav-item">
                       <a class="opcion nav-link text-light" href="gestion_clientes.html">Usuarios</a>
                     </li>
                     <li class="nav-item">
-                      <a class="selected nav-link text-light" href="gestion_productos.html">Gestión Productos</a>
+                      <a class="opcion nav-link text-light" href="gestion_productos.html">Gestión Productos</a>
                     </li>
                     <li class="nav-item">
                       <a class="opcion nav-link text-light" href="Reporte.html">Reportes</a>
@@ -124,23 +124,6 @@
 
 
           <div class="input-group">
-            <span>
-              <div class="dropdown">
-
-                <!-- CATEGORIAS -->
-                <span class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  Ordenar por
-                </span>
-
-                <!--OPCIONES DE CATEGORIAS-->
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Fecha</a></li>
-                  <li><a class="dropdown-item" href="#">N° de Servicio</a></li>
-                  <li><a class="dropdown-item" href="#">Nombre de Cliente</a></li>
-                </ul>
-              </div>
-            </span>
 
             <!-- BARRA DE BUSQUEDA -->
 
@@ -152,27 +135,40 @@
 
         </nav>
 
+        <div class="d-flex justify-content-center">
+            <div class="input-group col-6">
+                <input type="text" class="form-control" id="id_serv" placeholder="Id de Usuario a Eliminar. Ej: 2" value="" required>
+                <button class="btn btn-primary text-light" onclick="eliminar()">Eliminar</button>
+            </div>   
+        </div>
+
       </div>
 
 
 
     </div>
-    <h2 style="text-align: center;">Gestión Productos</h2>
+    <h2 style="text-align: center;">Eliminar Servicios</h2>
 
     <table style="display: block; width: 100%; height: 100%;" class="container mt-5 table table-striped">
       <thead style="display: block; width: 100%;">
         <tr style="display: flex; width: 100%;">
-          <th style="display: block; width: calc(100%/5);">ID</th>
-          <th style="display: block; width: calc(100%/5);">Nombre</th>
-          <th style="display: block; width: calc(100%/5);">Descripción</th>
-          <th style="display: block; width: calc(100%/5);">Stock</th>
-          <th style="display: block; width: calc(100%/5); color: green;">Precio c/u $</th>
+          <th style="display: block; width: calc(100%/7);">ID</th>
+          <th style="display: block; width: calc(100%/7);">ID Usuario</th>
+          <th style="display: block; width: calc(100%/7);" title="SERVICIO TÉCNICO, RESERVA, ETC...">Tipo</th>
+          <th style="display: block; width: calc(100%/7);">Fecha Inicial</th>
+          <th style="display: block; width: calc(100%/7);">Fecha Final</th>
+          <th style="display: block; width: calc(100%/7);">Estado</th>
+          <th style="display: block; width: calc(100%/7);">Precio Acumulado</th>
         </tr>
       </thead>
       <tbody style="display: block; width: 100%; overflow-y: scroll; height: 500px;" id="body_content">
       </tbody>
     </table>
   </main>
+
+  <div class="container-flow d-flex justify-content-center gap-2">
+    <a class="btn btn-primary" href="gestion_servicios.html" role="button" id="VolverServicios">Volver a Gestion de Servicios</a>
+  </div>
 
   <footer>
     <div class="container-fluid bg-primary p-4 mt-2 text-center">
@@ -194,8 +190,11 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>
 
-  <script src="gestion_productos.js"></script>
+  
 
 </body>
+
+<script src="crear_servicio.js"></script>
+<script src="gestion_servicios.js"></script>
 
 </html>
