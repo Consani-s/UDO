@@ -131,10 +131,12 @@ justify-content: space-between; height: 100vh;">
         <label for="tipo_usu" class="form-label">Tipo de Usuario</label>
         <select class="form-select" id="tipo_usu" required>
           <option selected disabled value="">Tipo</option>
-          <option>Cliente</option>
-          <option>Tecnico</option>
+          <option>0</option>
+          <option>1</option>
+          <option>2</option>
         </select>
       </div>
+      <i style="text-align: center; color: rgba(128, 128, 128, 0.548);">Nota: Cliente (0), Empleado (1), Administrador (2)</i>
 
       <div style=" display:flex; justify-content: center; margin: 0.7rem;" class="col-12">
         <button class="btn btn-primary" onclick="edituser()">Editar</button>

@@ -28,11 +28,17 @@ db.prepare(`CREATE TABLE IF NOT EXISTS Factura
 export default class $$Factura {
 
     static create(adminID, idEmisor, nombreVendedor, idRemitente, precioTotal) {
-        if (comprobarAdmin(adminID) < 1) throw new Error('No tienes permisos.');
+        if (comprobarAdmin(adminID) < 2) throw new Error('No tienes permisos.');
         let fecha = new Date();
         let fechaActual = fecha.getDate() + '-' + (fecha.getMonth() + 1) + '-' + fecha.getFullYear()
         let id = db.prepare(`INSERT INTO Factura (fecha, idEmisor, nombreVendedor, idRemitente, precioTotal) VALUES(?, ?, ?, ?, ?)`).run(fechaActual, idEmisor, nombreVendedor, idRemitente, precioTotal);
         return { 'id': id.lastInsertRowid };
+    }
+
+    static update(adminID, precioTotal, id) {
+        if (comprobarAdmin(adminID) < 2) throw new Error('No tienes permisos.');
+        let res = db.prepare(`UPDATE Factura SET precioTotal = ? WHERE id = ?`).run(precioTotal, id);
+        return { 'id': res.lastInsertRowid };
     }
 
     static read(idRemitente) {

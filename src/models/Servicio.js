@@ -27,8 +27,10 @@ function comprobarAdmin(adminID) {
 
 export default class $$Servicio {
 
-    static create(idUsuario, tipo, fechaInicial, fechaFinal, estado) {
+    static create(idUsuario, tipo, fechaFinal, estado) {
         let res;
+        let fecha = new Date();
+        let fechaInicial = fecha.getDate() + '-' + (fecha.getMonth() + 1) + '-' + fecha.getFullYear()
         res = db.prepare(`INSERT INTO Servicio (idUsuario, tipo, fechaInicial, fechaFinal, estado, precioAcumulado) VALUES(?, ?, ?, ?, ?, ?)`).run(idUsuario, tipo, fechaInicial, fechaFinal, estado, 0);
         return { 'id': res.lastInsertRowid };
     }

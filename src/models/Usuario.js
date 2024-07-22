@@ -32,7 +32,7 @@ export default class $$Usuario {
         if (json) {
 
             if (json.pass == pass) {
-                return { 'id': json.id };
+                return json;
             } else {
                 throw new Error('El usuario o contraseña son incorrectos.');
             }

@@ -13,7 +13,13 @@ function regisuser() {
     let passuser = $passuser.value || 0;
     let tipouser = $tipouser.value || 0;
     let user = $user.value || 'e'
-    fetch(`http://localhost:6060/createUsuario/1/${encodeURIComponent(ciuser)}/${encodeURIComponent(nomuser)}/${encodeURIComponent(tlfuser)}/${encodeURIComponent(user)}/${encodeURIComponent(passuser)}/${encodeURIComponent(tipouser)}`)
+    fetch(`http://localhost:6060/createUsuario/1
+        /${encodeURIComponent(ciuser)}
+        /${encodeURIComponent(nomuser)}
+        /${encodeURIComponent(tlfuser)}
+        /${encodeURIComponent(user)}
+        /${encodeURIComponent(passuser)}
+        /${encodeURIComponent(tipouser)}`)
     .then((res) => {
         if (!res.ok) {
             return res.json().then(error => alert(error.message));
@@ -54,6 +60,3 @@ function elimuser() {
         window.location.href = 'eliminarusuario.html'
     })
 }
-
-edituser()
-regisuser()

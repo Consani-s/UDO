@@ -201,6 +201,14 @@ server.get('/createFactura/:adminID/:idEmisor/:nombreVendedor/:idRemitente/:prec
     }
 });
 
+server.get('/updatePrecioFactura/:adminID/:precioTotal/:id', function (req, res) {
+    try {
+        res.status(200).send($$Factura.update(req.params.adminID, req.params.precioTotal, req.params.id));
+    } catch (error) {
+        res.status(400).send({ 'message': error.message });
+    }
+});
+
 server.get('/readFactura/:idRemitente', function (req, res) {
     try {
         res.status(200).send($$Factura.read(req.params.idRemitente));
